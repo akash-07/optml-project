@@ -80,6 +80,11 @@ Elements to note:
 - The number of steps that each client performs locally is sampled from a uniform distribution `[lb, up]`. Thus depending on the values of `-lb` and `-up` parameters, they may perform same or different number of local steps.
 - Since model initialisation affects convergence, to conduct reproducible experiments we can specify which initial model to pick via the file path to model weights (`-mwf` parameter). The folder `model_weights` contains a few initial models for every dataset.
 - Seed determines the client selection for every communication round.
-- Train and test directory paths correspond to how LEAF generates the data. This should generally be `leaf/data/dataset_name/{train, test}`.
+- Train and test directory paths correspond to how LEAF generates the data. This should generally be `leaf/data/dataset_name/data/{train, test}`.
+- The generated logs contain test metrics per `-ee` rounds and train metrics per round. They also contain a tensorboard log (in `\tb` dir) which can be directly used to visualise performance as: `tensorboard --logdir <path to log directory/tb>`.
 
 Rest all parameters are self-explanatory. Checkout `myrun.sh` for an example.
+
+For FEMNIST dataset, one could do:
+
+`./myrun.sh femnist 0.02 20 20 20 15 0 0`
