@@ -24,8 +24,8 @@ We will use the [leaf FL benchmark](https://github.com/TalwalkarLab/leaf) for pe
 LEAF has been added a submodule. To generate the dataset, do the following:
 
 ```
-# add instructions for fetching git submodule
-
+# pull git submodule locally
+git submodule update --init --recursive
 
 cd leaf/data/feminst
 
@@ -33,4 +33,4 @@ cd leaf/data/feminst
 ./preprocess.sh -s niid --sf 1.0 -k 100 -t sample --smplseed 10 --spltseed 10
 ```
 
-This make take an hour depending on your machine. So only do this where you intend to run code.
+This make take an hour depending on your machine. So only do this where you intend to run the code.

@@ -55,9 +55,9 @@ def client_update(model, dataset, server_weights, lr, accumulator):
         tf.nest.map_structure(lambda x, y: x.assign(y), client_weights, updated_weights)
         tf.nest.map_structure(lambda x, y: x.assign(y), accumulator, updated_accumulator)
     
+    # dictionary containing  {metric: [sum, count], ..}
     out_data = model.report_local_outputs()
-    tf.print(out_data)
-
+    
     return client_weights, out_data, out_data['loss'][1]
 
 @tff.tf_computation(tf_dataset_type, model_weights_type, tf.float32)

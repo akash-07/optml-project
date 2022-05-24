@@ -166,6 +166,7 @@ if(dset == 'femnist'):
     evaluate = evaluate_femnist
 
 TC = len(dataset.num_samples)
+print("Total number of client in this dataset:", TC)
 
 # import fl_setup with globals set ---------------
 # runs dynamic tracing with type-checking
