@@ -81,7 +81,7 @@ Elements to note:
 - Since model initialisation affects convergence, to conduct reproducible experiments we can specify which initial model to pick via the file path to model weights (`-mwf` parameter). The folder `model_weights` contains a few initial models for every dataset.
 - Seed determines the client selection for every communication round.
 - Train and test directory paths correspond to how LEAF generates the data. This should generally be `leaf/data/dataset_name/data/{train, test}`.
-- The generated logs contain test metrics per `-ee` rounds and train metrics per round. They also contain a tensorboard log (in `\tb` dir) which can be directly used to visualise performance as: `tensorboard --logdir <path to log directory/tb>`.
+- The generated logs contain test metrics per `-ee` rounds and train metrics per round. They also contain a tensorboard log (in `/tb` subdirectory) which can be directly used to visualise performance as: `tensorboard --logdir <path to log directory/tb>`.
 - Rest all parameters are self-explanatory. 
 
 ![Screenshot 2022-05-24 at 16 54 48](https://user-images.githubusercontent.com/24961068/170066838-b7eaaaea-090c-42a5-b106-103f4d611e7f.png)
