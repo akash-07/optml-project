@@ -8,3 +8,7 @@ notes/convergence_proof_notes.log
 notes/convergence_proof_notes.out
 notes/convergence_proof_notes.synctex.gz
 notes/.vscode/settings.json
+venv
+leaf
+logs
+*/__pycache__
