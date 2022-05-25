@@ -1,0 +1,192 @@
+\subsection{Setting and assumptions}
+\label{assumptions}
+As a preliminary step to the analysis of algorithm \ref{FedAVG}, we make the following 7 assumptions:
+
+\begin{enumerate}
+    \item At any round $t$ each \textit{client} takes $\tau \in \mathbb{N}$ local SGD steps with constant learning rate $\eta$ (which we denote as $\bm{x}_i^{(t,k+1)} \leftarrow \bm{x}_i^{(t,k)} - \eta g_i(\bm{x}_i^{(t,k)})$ with $g_i$ is one draw of the stochastic gradient of $F_i$ and $k \in [0,k)$.
+    \item The \textit{server step} is computed as $\bm{x}^{(t+1)} \leftarrow \bm{x}^{(t)} + \Delta^{(t)}$.
+    \item There are $(M)$ clients labelled $i \in \{0,1,...,M\}$ and each client contributes a uniform share of the global objective $F(\bm{x}) = \frac{1}{M} \sum^{M}_{i=1} F_i(\bm{x})$.
+    \item Each clients takes part in every round.
+    \item Each local objective $F_i$ is convex and $L$-smooth.
+    \item Each client queries an unbiased stochastic gradient with $\sigma^2$-uniformly bounded variance in $l_2$ norm, i.e.
+    \begin{align}
+        \mathbb{E}[g_i(\bm{x}^{(t,k)}_i) | \bm{x}^{(t,k)}_i] = \nabla F_i(\bm{x}_i^{(t,j)}), \\
+        \mathbb{E}[\| g_i(\bm{x}^{(t,k)}_i) -  F_i(\bm{x}_i^{(t,j)}) \|^2 | \bm{x}_i^{(t,k)} ] \leq \sigma^2.
+    \end{align}
+    \item The difference of local gradient $\nabla F_i(\bm{x})$ and the global gradient $\nabla F(\bm{x})$ is $\zeta$-uniformly bounded in $l_2$ norm, i.e.
+    \begin{align}
+        \max_i \sum_{\bm{x}} \| \nabla F_i(\bm{x}) - \nabla F(\bm{x}) \| \leq \zeta.
+    \end{align}
+\end{enumerate}
+
+First, let us define the shadow sequence which we will use to make the notation a bit more readable as we go through the proof:
+
+\begin{notation}
+    (Shadow sequence) We call the sequence described by $\bar{x}^{t,k} = \frac{1}{M} \sum_{i=1}^{M} \bm{x}_i^{(t,k)}$ the shadow sequence.
+\end{notation}
+
+As we often do in the optimization literature we will try to show a result of the form: 
+\[ \mathbb{E}\left[ \frac{1}{\tau T} \sum_{t=0}^{T-1} \sum_{k=1}^{\tau} F(\bar{\bm{x}}^{(t,k)}) -F(\bm{x}^*) \right] = O\left( \frac{1}{\tau T} \right). \]
+
+Which one can read as \textit{as we progress, in expectation we are guaranteed to have an error that goes to some small constant}. In order to get to a bound we will have to prove two lemmas to show that. Showing that this results is true amounts to finding a relevant upper bound decreasing in $\frac{1}{\tau T}$. We split our proving effort in two steps:
+
+
+\begin{enumerate}
+    \item We are making progress in each round $\mathbb{E}\left[ \frac{1}{\tau} \sum^{\tau}_{k=1} F(\bar{\bm{x}}^{(t,k)}) - F(\bm{x}^*) \right]$ is bounded by some term decreasing when $t$ increases.
+    \item All client iterates remain close to the global average (the shadow sequence), i.e. $\| \bm{x}_i^{(t,k)} - \hat{\bm{x}}^{(t,k)}  \|_{l_2}$ is bounded in expectation.
+\end{enumerate}
+
+Formally we will write our proof using one theorem that relies on two lemmas (showing both properties discussed above). The formal proofs are detailed in the next section.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.6\textwidth]{figures/FedAVG_traj.pdf}
+    \caption{Illustration of the progression of one $4$ step round of algorithm \ref{FedAVG} with the shadow sequence represented on green.}
+\end{figure}
+
+\subsection{Convergence of FedAVG}
+
+We will prove the following results. 
+
+
+\begin{theorem}
+    (Convergence for Convex Functions) under the assumptions and assuming $\eta \leq \frac{1}{4L}$ one has: 
+
+    \begin{equation}
+        \begin{aligned}
+            \mathbb{E} \left[ \frac{1}{\tau T} \sum_{t=0}^{T-1}\sum_{k=1}^{\tau} F(\bar{\bm{x}}^{(t,k)}) - F(\bm{x}^*)\right] 
+            \leq \frac{D^2}{2 \eta \tau T} + \frac{\eta \sigma^2}{M} + 4 \tau \eta^2 L \sigma^2 + 18 \tau^2 \eta^2 L \zeta^2 \\
+            = O\left( \frac{1}{\tau T} \right)
+        \end{aligned}
+        \label{eq:convergence}
+    \end{equation}
+    \label{convergence}
+\end{theorem}
+
+\noindent
+To which we will get using two lemmas:
+
+\begin{lemma}
+    (Per round progress) Assuming $\eta \leq \frac{1}{4L}$, for one round $t$ of the algorithm, one has: 
+    
+    \begin{equation}
+        \begin{aligned}
+            \mathbb{E} \left[ \frac{1}{\tau} \sum_{k=1}^{\tau} F(\bar{\bm{x}}^{(t,k)}) - F(\bm{x}^*)\right]  \\
+            \leq \frac{1}{2 \eta \tau} \left( \| \bar{\bm{x}}^{(t,0)} -\bm{x}^{*} \|^2 - \mathbb{E}\left[  \| \bar{\bm{x}}^{(t,\tau)} -\bm{x}^{*} \|^2  | \mathcal{F}^{(t,0)}\right]  \right)\\
+            + \frac{\eta \sigma^2}{M} + \frac{1}{M \tau} \sum^M_{i=1} \sum^{\tau-1}_{k=1} \mathbb{E} \left[ \| \bm{x}_i^{(t,k)} -\bar{\bm{x}}^{(t,k)} \|^2 | \mathcal{F}^{(0,t)}\right]
+        \end{aligned}
+        \label{eq:per_round_progress}
+    \end{equation}
+    \label{per_round_progress}
+\end{lemma}
+
+\begin{lemma}
+    (Bounded client drift) Assuming $\eta \leq \frac{1}{4L}$, for one round $t$ of the algorithm, one has: 
+    
+    \begin{equation}
+        \begin{aligned}
+            \mathbb{E} \left[ \| \bm{x}_i^{(t,k)} -\bar{\bm{x}}^{(t,k)} \|^2 | \mathcal{F}^{(0,t)}\right]
+            \leq 18\tau^2 \eta^2 \zeta^2 + 4 \tau \eta^2 \sigma^2
+        \end{aligned}
+        \label{eq:client_drift}
+    \end{equation}
+    \label{client_drift}
+\end{lemma}
+
+\subsubsection*{Proving Theorem \ref{convergence} (convergence of FedAVG)}
+
+Most of the technical work will lie in proving the two lemmas, but first we will focus on proving theorem \ref{convergence}, while assuming that lemmas \ref{per_round_progress} and \ref{client_drift} are true.
+
+\begin{proof}
+    (Of Theorem \ref{convergence}.) We want to find a bound for the quantity \[ \mathbb{E} \left[ \frac{1}{\tau T} \sum_{t=0}^{T-1}\sum_{k=1}^{\tau} F(\bar{\bm{x}}^{(t,k)}) - F(\bm{x}^*)\right], \]
+    to do so we will use the bound on $\mathbb{E} \left[ \frac{1}{\tau} \sum_{k=1}^{\tau} F(\bar{\bm{x}}^{(t,k)}) - F(\bm{x}^*)\right]$ which is given by lemma \ref{per_round_progress}. First, let's write out the sum on which we will take the expectation and express it as a function of the per round progress which we bounded in lemma \ref{per_round_progress}:
+
+    \begin{align*}
+        \mathbb{E} \left[ \frac{1}{\tau T} \sum_{t=0}^{T-1}\sum_{k=1}^{\tau} F(\bar{\bm{x}}^{(t,k)}) - F(\bm{x}^*)\right], \\
+        = \mathbb{E} \left[\frac{1}{T} \sum^{T-1}_{t=0} \overbrace{\mathbb{E} \left[ \frac{1}{\tau} \sum_{k=1}^{\tau} F(\bar{\bm{x}}^{(t,k)}) - F(\bm{x}^*)\right] }^{(\triangledown)}\right].
+    \end{align*}
+    Observing that the term $(\triangledown)$ is the left side of the inequality (\ref{eq:per_round_progress}) of lemma \ref{per_round_progress}, we use the lemma to bound our expectation. Using linearity of expectation we split this expression in three different terms which we will then discuss separately.
+    \begin{align*}
+    \leq \mathbb{E}
+        \Bigg[ \frac{1}{T} \sum_{t=0}^{T-1} \frac{1}{2 \eta \tau} \left( \| \bar{\bm{x}}^{(t,0)} -\bm{x}^{*} \|^2 - \mathbb{E}\left[  \| \bar{\bm{x}}^{(t,\tau)} -\bm{x}^{*} \|^2  | \mathcal{F}^{(t,0)}\right]  \right) \\
+        + \frac{\eta \sigma^2}{M} + \frac{1}{M \tau} \sum^M_{i=1} \sum^{\tau-1}_{k=1} \mathbb{E} \left[ \| \bm{x}_i^{(t,k)} -\bar{\bm{x}}^{(t,k)} \|^2 | \mathcal{F}^{(0,t)}\right] \Bigg] \\
+        = \overbrace{\mathbb{E}\Bigg[ \frac{1}{T} \sum_{t=0}^{T-1} \frac{1}{2 \eta \tau} \left( \| \bar{\bm{x}}^{(t,0)} -\bm{x}^{*} \|^2 - \mathbb{E}\left[  \| \bar{\bm{x}}^{(t,\tau)} -\bm{x}^{*} \|^2  | \mathcal{F}^{(t,0)}\right] \right) \Bigg]}^{(\bigstar)} \\
+        + \overbrace{\frac{\eta \sigma^2}{M}}^{(\diamond)} +  \overbrace{\frac{1}{M \tau}\sum^M_{i=1} \sum^{\tau-1}_{k=1} \mathbb{E} \left[ \| \bm{x}_i^{(t,k)} -\bar{\bm{x}}^{(t,k)} \|^2 | \mathcal{F}^{(0,t)}\right] }^{(\dagger)}
+    \end{align*}
+    Let us now consider the three terms. Terms $(\diamond)$ and $(\dagger)$ gives a bound on individual client drift (i.e. how far do the clients get from the shadow sequence), term $(\bigstar)$ gives a bound on the global progression. Here our goal is to show that $(\diamond)$ and $(\dagger)$ can be arbitrarily bounded as a function of the algorithm's parameters and that $(\bigstar)$ goes to $0$ with $T\cdot \tau$. We now discuss bounds for every single term.
+    \begin{enumerate}
+        \item Term $(\diamond)$ is already a function of our algorithm's parameters, there is nothing to show here.
+        \item Now we consider term $(\dagger)$:
+        \[ \frac{1}{M \tau}\sum^M_{i=1} \sum^{\tau-1}_{k=1} \overbrace{\mathbb{E} \left[ \| \bm{x}_i^{(t,k)} -\bar{\bm{x}}^{(t,k)} \|^2 | \mathcal{F}^{(0,t)}\right]}^{(\spadesuit)} \]
+        it is a sum over term $(\spadesuit)$, which is the left side the inequality (\ref{eq:client_drift}) of lemma \ref{client_drift}. We plug the right side of (\ref{eq:client_drift}) and as it is not a function of the sum variables we can drop the sums as well.
+        \begin{align*}
+            (\dagger) \leq 18\tau^2 \eta^2 \zeta^2 + 4 \tau \eta^2 \sigma^2 \\
+        \end{align*}
+        \item Finally we consider term $(\bigstar)$, 
+        \begin{align*}
+            \mathbb{E}\Bigg[ \frac{1}{T} \sum_{t=0}^{T-1} \frac{1}{2 \eta \tau} \left( \| \bar{\bm{x}}^{(t,0)} -\bm{x}^{*} \|^2 - \mathbb{E}\left[  \| \bar{\bm{x}}^{(t,\tau)} -\bm{x}^{*} \|^2  | \mathcal{F}^{(t,0)}\right] \right) \Bigg],
+        \end{align*}
+        here we have to use a few tricks. First using that expectation is linear we will separate our terms and using that $\mathbb{E}\left[ \mathbb{E}[x] \right] = \mathbb{E}[x]$ we will drop the double expectation in the sum:
+        \begin{align*}
+            \frac{1}{2 \eta \tau T}  \sum_{t=0}^{T-1}   \left(\mathbb{E}\left[  \| \overbrace{\bar{\bm{x}}^{(t,0)}}^{\bar{\bm{x}}^{(t)}} -\bm{x}^{*} \|^2 \right] - \mathbb{E}\left[  \| \overbrace{\bar{\bm{x}}^{(t,\tau)}}^{\bar{\bm{x}}^{(t+1)}} -\bm{x}^{*} \|^2  \right] \right).
+        \end{align*}
+        At this point we first observe (as denoted above) that by definition of the algorithm we have $\bar{\bm{x}}^{(t+1)} = \bar{\bm{x}}^{(t+1,0)} = \bar{\bm{x}}^{(t,\tau)}$ and $\bar{\bm{x}}^{(t)} = \bar{\bm{x}}^{(t,0)}$, then for readability we make use of the notation $d(\bm{x}) = \mathbb{E} \left[ \| \bm{x}-\bm{x}^*\|^2 \right]$ and write out the sum over $t$:
+        \begin{align*}
+           \sum_{t=0}^{T-1}  \left( d(\bm{x}^{(t)}) - d(\bm{x}^{(t+1)}) \right)
+            \\=  d(\bm{x}^{(0)}) - d(\bm{x}^{(1)}) +  d(\bm{x}^{(1)}) - d(\bm{x}^{(2)})  \\
+            + \cdots +  d(\bm{x}^{(T-2)}) - d(\bm{x}^{(T-1)})  + d(\bm{x}^{(T-1)}) - d(\bm{x}^{(T)}) .
+        \end{align*}
+        Observing that the terms cancel out we get the following expression: 
+        \begin{align*}
+        (\bigstar)= \frac{1}{2 \eta \tau T} \Big( d(\bm{x}^{(0)}) - \cancel{d(\bm{x}^{(1)})} +  \cancel{ d(\bm{x}^{(1)})} - \cancel{d(\bm{x}^{(2)})}  \\
+        + \cdots + \cancel{ d(\bm{x}^{(T-2)}) } - \cancel{ d(\bm{x}^{(T-1)}) } + \cancel{ d(\bm{x}^{(T-1)}) } -  d(\bm{x}^{(T)}) \Big) \\= \frac{1}{2 \eta \tau T} \Big( d(\bm{x}^{(0)})  -  d(\bm{x}^{(T)}) \Big) \leq \frac{d(\bm{x}^{(0)})}{2 \eta \tau T} = \frac{D^2}{2 \eta \tau T} .
+        \end{align*}
+        Where $d(\bm{x}^{(0)}) = \mathbb{E}[\| \bm{x}^{(0)} -\bm{x}^* \|^2] = \| \bm{x}^{(0)} -\bm{x}^* \|^2 = D^2$ with $D$ the diameter to the global opt at the beginning of the gradient descent (this is a constant).
+    \end{enumerate}
+    Putting all bounds back together we get the following convergence bound (which concludes the proof):
+    \[\mathbb{E} \left[ \frac{1}{\tau T} \sum_{t=0}^{T-1}\sum_{k=1}^{\tau} F(\bar{\bm{x}}^{(t,k)}) - F(\bm{x}^*)\right] 
+    \leq \overbrace{\frac{D^2}{2 \eta \tau T} }^{(\bigstar)}+\overbrace{ \frac{\eta \sigma^2}{M}}^{(\diamond)} + \overbrace{4 \tau \eta^2 L \sigma^2 + 18 \tau^2 \eta^2 L \zeta^2}^{(\dagger)} \]
+    
+\end{proof}
+
+We now get in the (somewhat) more technical parts of the proof, proving the lemmas. 
+
+\subsubsection*{Proving Lemma \ref{per_round_progress} (per round progression)}
+
+Let's start with the per round progress lemma, we want to bound the quantity : 
+
+\begin{align*}
+    \mathbb{E} \left[ \frac{1}{\tau} \sum_{k=1}^{\tau} F(\bar{\bm{x}}^{(t,k)}) - F(\bm{x}^*)\right],
+\end{align*}
+
+in $O(\frac{1}{\tau})$. Similarly to what we just did for the theorem (and to how most of these convergence proofs are computed), we will to try to bound a single term of the sum (in expectation) by the previous term and then we will telescope the sum to get a serviceable bound. In other words we are trying to bound the expectation: 
+
+\begin{align*}
+    \mathbb{E} \Big[ \overbrace{F(\bar{\bm{x}}^{(t,k+1)}) - F(\bm{x}^*)}^{(\heartsuit)} | \mathcal{F}^{(t,k)}\Big].
+\end{align*}
+
+Since it is an expectation, which we will do by bounding the $(\heartsuit)$ term. Writing it out we can first split it between the separate client objective functions:
+
+\begin{align*}
+    (\heartsuit) = F(\bar{\bm{x}}^{(t,k+1)}) - F(\bm{x}^*) = \frac{1}{M} \sum_{i=1}^M \left( F_i(\bar{\bm{x}}^{(t,k+1)})  - F(\bm{x}^*)\right).
+\end{align*}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.6\textwidth]{figures/smooth_convex.pdf}
+    \caption{Illustration of the L-smooth/convex properties of $F_i$.}
+\end{figure}
+
+Looking at the expression above, we clearly see that bounding $(\heartsuit)$ will amount to bound $F_i(\bar{\bm{x}}^{(t,k+1)})$, which we will do using the smoothness (property \ref{lsmooth}) and convexity (property \ref{convexity}) properties from the assumptions made in section \ref{assumptions}. First, we get an upper bound from the L-smoothness of $F_i$:
+
+\begin{align*}
+    F_i(\bar{\bm{x}}^{(t,k+1)}) \leq  F_i(\bm{x}) +  \langle \nabla F_i(\bm{x}) ,\bar{\bm{x}}^{(t,k+1)}-\bm{x} \rangle +  \frac{L}{2} \|\bar{\bm{x}}^{(t,k+1)}-\bm{x} \|^2, ~ \forall \bm{x}.
+\end{align*}
+
+This inequality is true for all $\bm{x} \in \bm{dom}(f)$ but we care about the algorithm's step and for each $F_i(\bar{\bm{x}}^{(t,k+1)})$ the step of the algorithm depends of $\bm{x}_i^{(t,k)}$ (the parameters of client $i$ at the previous time step).
+
+\begin{align*}
+    F_i(\bar{\bm{x}}^{(t,k+1)}) \leq  F_i(\bm{x}_i^{(t,k)}) +  \langle \nabla F_i(\bm{x}_i^{(t,k)}) ,\bar{\bm{x}}^{(t,k+1)}-\bm{x}_i^{(t,k)} \rangle +  \frac{L}{2} \|\bar{\bm{x}}^{(t,k+1)}-\bm{x}_i^{(t,k)} \|^2 \\
+    \leq  F_i(\bm{x}^{*}) +  \langle \nabla F_i(\bm{x}_i^{(t,k)}) ,\bm{x}^{*}-\bm{x}_i^{(t,k)} \rangle +  \frac{L}{2} \|\bar{\bm{x}}^{(t,k+1)}-\bm{x}_i^{(t,k)} \|^2
+\end{align*}
+

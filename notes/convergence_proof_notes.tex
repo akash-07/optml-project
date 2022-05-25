@@ -1,0 +1,70 @@
+\documentclass[11pt,hidelinks]{article}
+
+\usepackage{sectsty}
+\usepackage{graphicx}
+\usepackage[T1]{fontenc}
+\usepackage{epigraph} %quotes
+\usepackage{amssymb} %math symbols
+\usepackage{mathtools} %more math stuff
+\usepackage{amsthm} %theorems, proofs and lemmas
+\usepackage[ruled,vlined]{algorithm2e} %algoritms/pseudocode
+\usepackage{subfiles}
+\usepackage{bm}
+\usepackage{wrapfig} 
+\usepackage[makeroom]{cancel}
+\usepackage{hyperref}
+
+%% Theorem notation
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{corollary}{Corollary}[theorem]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{problem}{Problem}[section]
+\newtheorem{definition}{Definition}[section]
+\newtheorem{property}{Property}[section]
+\newtheorem{notation}{Notation}[section]
+
+%% declaring abs so that it works nicely
+\DeclarePairedDelimiter\abs{\lvert}{\rvert}%
+\DeclarePairedDelimiter\norm{\lVert}{\rVert}%
+
+% Swap the definition of \abs* and \norm*, so that \abs
+% and \norm resizes the size of the brackets, and the 
+% starred version does not.
+\makeatletter
+\let\oldabs\abs
+\def\abs{\@ifstar{\oldabs}{\oldabs*}}
+%
+\let\oldnorm\norm
+\def\norm{\@ifstar{\oldnorm}{\oldnorm*}}
+\makeatother
+
+% Marges
+\topmargin=-0.45in
+\evensidemargin=0in
+\oddsidemargin=0in
+\textwidth=5.5in
+\textheight=9.0in
+\headsep=0.5in
+
+
+\title{Notes on the FedAVG algorithm}
+\date{\today}
+\author{Titouan Renard}
+
+\begin{document}
+\maketitle	
+\tableofcontents
+
+\section{Setting and Algorithm}
+\subfile{sections/alg.tex}
+\newpage
+
+\section{Analysis of the Algorithm}
+\subfile{sections/proof.tex}
+\newpage
+\subsection{Properties used for the proof}
+\subfile{sections/def.tex}
+\newpage
+
+
+\end{document}
