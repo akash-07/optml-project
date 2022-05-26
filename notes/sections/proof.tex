@@ -159,34 +159,136 @@ Let's start with the per round progress lemma, we want to bound the quantity :
     \mathbb{E} \left[ \frac{1}{\tau} \sum_{k=1}^{\tau} F(\bar{\bm{x}}^{(t,k)}) - F(\bm{x}^*)\right],
 \end{align*}
 
-in $O(\frac{1}{\tau})$. Similarly to what we just did for the theorem (and to how most of these convergence proofs are computed), we will to try to bound a single term of the sum (in expectation) by the previous term and then we will telescope the sum to get a serviceable bound. In other words we are trying to bound the expectation: 
+in $O(\frac{1}{\tau})$. Similarly to what we just did for the theorem (and to how most of these convergence proofs are computed), we will to try to bound a single term of the sum (in expectation) by the previous term and then we will telescope the sum to get a serviceable bound. In other words we are trying to bound the expectation:
 
-\begin{align*}
-    \mathbb{E} \Big[ \overbrace{F(\bar{\bm{x}}^{(t,k+1)}) - F(\bm{x}^*)}^{(\heartsuit)} | \mathcal{F}^{(t,k)}\Big].
-\end{align*}
+\begin{align}
+    (\dagger) = \mathbb{E} \Big[ \overbrace{F(\bar{\bm{x}}^{(t,k+1)}) - F(\bm{x}^*)}^{(\heartsuit)} | \mathcal{F}^{(t,k)}\Big],
+    \label{eq:expected_sub_progress}
+\end{align}
 
-Since it is an expectation, which we will do by bounding the $(\heartsuit)$ term. Writing it out we can first split it between the separate client objective functions:
+In order to get a bound on the expectation $(\dagger)$, most of the work we will have to do will lie in understanding the $(\heartsuit)$ term on which we take the expectation. Writing it out we can first split it between the separate client objective functions:
 
-\begin{align*}
+\begin{align}
     (\heartsuit) = F(\bar{\bm{x}}^{(t,k+1)}) - F(\bm{x}^*) = \frac{1}{M} \sum_{i=1}^M \left( F_i(\bar{\bm{x}}^{(t,k+1)})  - F(\bm{x}^*)\right).
-\end{align*}
+    \label{eq:sub_progress}
+\end{align}
 
 \begin{figure}[h!]
     \centering
     \includegraphics[width=0.6\textwidth]{figures/smooth_convex.pdf}
-    \caption{Illustration of the L-smooth/convex properties of $F_i$.}
+    \caption{Illustration of the L-smooth/convex properties of $F_i$. Convexity implies that the function is above the half space tangent to the graph at any point (in red) and that is is below the parabola with parameter $L$ (in blue). In other words, the function being L-smooth and convex is necessarily in the green area of the plot. Furthermore observe that the global minimum $\bm{x}^*$ of $F$ is not the minimum of $F_i$, so we cannot use that property directly.}
 \end{figure}
 
-Looking at the expression above, we clearly see that bounding $(\heartsuit)$ will amount to bound $F_i(\bar{\bm{x}}^{(t,k+1)})$, which we will do using the smoothness (property \ref{lsmooth}) and convexity (property \ref{convexity}) properties from the assumptions made in section \ref{assumptions}. First, we get an upper bound from the L-smoothness of $F_i$:
+Looking at the expression above, we clearly see that bounding $(\heartsuit)$ will amount to bound $F_i(\bar{\bm{x}}^{(t,k+1)})$, which we will do using the smoothness (property \ref{lsmooth}) and convexity (property \ref{convexity}) properties from the assumptions made in section \ref{assumptions}. First, we get an upper bound from the L-smoothness (property \ref{lsmooth}) of $F_i$:
 
 \begin{align*}
     F_i(\bar{\bm{x}}^{(t,k+1)}) \leq  F_i(\bm{x}) +  \langle \nabla F_i(\bm{x}) ,\bar{\bm{x}}^{(t,k+1)}-\bm{x} \rangle +  \frac{L}{2} \|\bar{\bm{x}}^{(t,k+1)}-\bm{x} \|^2, ~ \forall \bm{x}.
 \end{align*}
 
-This inequality is true for all $\bm{x} \in \bm{dom}(f)$ but we care about the algorithm's step and for each $F_i(\bar{\bm{x}}^{(t,k+1)})$ the step of the algorithm depends of $\bm{x}_i^{(t,k)}$ (the parameters of client $i$ at the previous time step).
+This inequality is true for all $\bm{x} \in \bm{dom}(f)$ but we care about the algorithm's step and for each $F_i(\bar{\bm{x}}^{(t,k+1)})$ the step of the algorithm depends of $\bm{x}_i^{(t,k)}$ (the parameters of client $i$ at the previous time step). Using observation \ref{obs} (which we can do as $F_i$ is convex) we further bound the $(\spadesuit)$ term as a function of $\bm{x}^*$ instead of $\bm{x}_i^{(t,k)}$ which we don't know.
 
 \begin{align*}
-    F_i(\bar{\bm{x}}^{(t,k+1)}) \leq  F_i(\bm{x}_i^{(t,k)}) +  \langle \nabla F_i(\bm{x}_i^{(t,k)}) ,\bar{\bm{x}}^{(t,k+1)}-\bm{x}_i^{(t,k)} \rangle +  \frac{L}{2} \|\bar{\bm{x}}^{(t,k+1)}-\bm{x}_i^{(t,k)} \|^2 \\
-    \leq  F_i(\bm{x}^{*}) +  \langle \nabla F_i(\bm{x}_i^{(t,k)}) ,\bm{x}^{*}-\bm{x}_i^{(t,k)} \rangle +  \frac{L}{2} \|\bar{\bm{x}}^{(t,k+1)}-\bm{x}_i^{(t,k)} \|^2
+    F_i(\bar{\bm{x}}^{(t,k+1)}) \leq \overbrace{F_i(\bm{x}_i^{(t,k)}) +  \langle \nabla F_i(\bm{x}_i^{(t,k)}) ,\bar{\bm{x}}^{(t,k+1)}-\bm{x}_i^{(t,k)} \rangle}^{(\spadesuit)} +  \frac{L}{2} \|\bar{\bm{x}}^{(t,k+1)}-\bm{x}_i^{(t,k)} \|^2 \\
+    \leq F_i(\bm{x}^{*}) +  \langle \nabla F_i(\bm{x}_i^{(t,k)}) ,\bar{\bm{x}}^{(t,k+1)} - \bm{x}^{*} \rangle + \overbrace{ \frac{L}{2} \|\bar{\bm{x}}^{(t,k+1)}-\bm{x}_i^{(t,k)} \|^2}^{\square}
 \end{align*}
 
+Now in order to get a bound on the $(\square)$ term we will try to split the $\bm{x}_i^{(t,k)}$ variable and express our bound as a function of the  pre step progress and the distance between clients (which we will bound using the client drift lemma later). To do so we use the triangle inequality ($\|a+b\| \leq \|a\|+\|b\|$):
+
+
+\begin{align*}
+    \overbrace{\bar{\bm{x}}^{(t,k+1)}-\bm{x}_i^{(t,k)}}^{a+b} = \overbrace{\bar{\bm{x}}^{(t,k+1)} - \bar{\bm{x}}^{(t,k)}}^a + \overbrace{\bar{\bm{x}}^{(t,k)} - \bm{x}_i^{(t,k)} }^b\\
+    \square = \frac{L}{2} \|\bar{\bm{x}}^{(t,k+1)}-\bm{x}_i^{(t,k)} \|^2 \\
+    \leq  \frac{L}{2} \|\bar{\bm{x}}^{(t,k+1)}-\bar{\bm{x}}^{(t,k)} \|^2  + \frac{L}{2} \|\bar{\bm{x}}^{(t,k)}-\bm{x}_i^{(t,k)} \|^2  \\
+    \leq  L \|\bar{\bm{x}}^{(t,k+1)}-\bar{\bm{x}}^{(t,k)} \|^2  + L \|\bar{\bm{x}}^{(t,k)}-\bm{x}_i^{(t,k)} \|^2 
+\end{align*}
+
+The last step is just done for readability, we could actually get a tighter bound by keeping the factor two in there. Plugging this back in the $F_i(\bar{\bm{x}}^{(t,k+1)})$ bound we get the following inequality:
+
+
+\begin{align*}
+    F_i(\bar{\bm{x}}^{(t,k+1)}) \leq F_i(\bm{x}^{*}) +  \langle \nabla F_i(\bm{x}_i^{(t,k)}) ,\bar{\bm{x}}^{(t,k+1)} - \bm{x}^{*} \rangle \\+ L \|\bar{\bm{x}}^{(t,k+1)}-\bar{\bm{x}}^{(t,k)} \|^2  + L \|\bar{\bm{x}}^{(t,k)}-\bm{x}_i^{(t,k)} \|^2 
+\end{align*}
+
+Let's plug what we just derived in equation (\ref{eq:sub_progress}):
+
+
+\begin{align*}
+    (\heartsuit) = F(\bar{\bm{x}}^{(t,k+1)}) - F(\bm{x}^*) = \frac{1}{M} \sum_{i=1}^M \left( F_i(\bar{\bm{x}}^{(t,k+1)})  - F(\bm{x}^*)\right) \\
+    \leq  \frac{1}{M} \sum_{i=1}^M \Big( F_i(\bm{x}^{*}) +  \langle \nabla F_i(\bm{x}_i^{(t,k)}) ,\bar{\bm{x}}^{(t,k+1)} - \bm{x}^{*} \rangle \\+ L \|\bar{\bm{x}}^{(t,k+1)}-\bar{\bm{x}}^{(t,k)} \|^2  + L \|\bar{\bm{x}}^{(t,k)}-\bm{x}_i^{(t,k)} \|^2  - F(\bm{x}^*)\Big).
+\end{align*}
+
+Using the linearity of the sum we can split this expression into separate terms:
+
+\begin{align*}
+    (\heartsuit) \leq \overbrace{\frac{1}{M} \sum_{i=1}^M F_i(\bm{x}^{*}) - F(\bm{x}^*)}^{=0} + \frac{1}{M} \sum_{i=1}^M  \langle \nabla F_i(\bm{x}_i^{(t,k)}) ,\bar{\bm{x}}^{(t,k+1)} - \bm{x}^{*} \rangle \\+ L \frac{1}{M} \sum_{i=1}^M \overbrace{ \|\bar{\bm{x}}^{(t,k+1)}-\bar{\bm{x}}^{(t,k)} \|^2}^\text{not a function of $i$}  + L \frac{1}{M} \sum_{i=1}^M \|\bar{\bm{x}}^{(t,k)}-\bm{x}_i^{(t,k)} \|^2 \\
+    = \overbrace{\frac{1}{M} \sum_{i=1}^M  \langle \nabla F_i(\bm{x}_i^{(t,k)}) ,\bar{\bm{x}}^{(t,k+1)} - \bm{x}^{*} \rangle}^{(\blacklozenge)} \\+ L  \|\bar{\bm{x}}^{(t,k+1)}-\bar{\bm{x}}^{(t,k)} \|^2  +\overbrace{ L \frac{1}{M} \sum_{i=1}^M \|\bar{\bm{x}}^{(t,k)}-\bm{x}_i^{(t,k)} \|^2 }^{{\blacksquare}}
+\end{align*}
+
+This brings us closer to bounding the $(\heartsuit)$ term, remembering that we are working with values inside of an expectation, we clearly see that term $(\blacksquare)$ is a measure of variance (which we will bound later with the client drift lemma). Taking a look at the sum the term that requires and explanation is the $(\blacklozenge)$ term, which we will now take a look at. Recall that the FedAVG algorithm queries stochastic gradients $g_i$, which are unbiased, variance bounded estimators of the true gradient $\nabla F_i$. Observe that we write out the local client gradient as:
+
+\begin{align}
+    g_i(\bm{x}) = \overbrace{g_i(\bm{x})}^{(\triangleleft)} + \overbrace{\left(F_i(\bm{x}) - g_i(\bm{x}) \right)}^{(\triangleright)},
+    \label{eq:grad_dev}
+\end{align}
+
+where $(\triangleleft)$ represents the true gradient of client objective $F_i$ and $(\triangleright)$ the deviation from that value. This is useful as we know from the assumptions that the deviation is $0$ in expectation ($g_i$ is an unbiased estimator of $\nabla F_i$). Using the decomposition (\ref{eq:grad_dev}) we can develop the $(\heartsuit)$ bound as follows:
+
+\begin{align*}
+    (\heartsuit) \leq \frac{1}{M} \sum_{i=1}^M  \langle g_i(\bm{x})  + \left(F_i(\bm{x}) - g_i(\bm{x}) \right) ,\bar{\bm{x}}^{(t,k+1)} - \bm{x}^{*} \rangle  \\+ L  \|\bar{\bm{x}}^{(t,k+1)}-\bar{\bm{x}}^{(t,k)} \|^2  +L \frac{1}{M} \sum_{i=1}^M \|\bar{\bm{x}}^{(t,k)}-\bm{x}_i^{(t,k)} \|^2 \\
+    = \overbrace{\frac{1}{M} \sum_{i=1}^M  \langle g_i(\bm{x})  ,\bar{\bm{x}}^{(t,k+1)} - \bm{x}^{*} \rangle  }^{(\blacktriangleleft)}
+    + \overbrace{\frac{1}{M} \sum_{i=1}^M  \langle F_i(\bm{x}) - g_i(\bm{x})  ,\bar{\bm{x}}^{(t,k+1)} - \bm{x}^{*} \rangle  }^{(\blacktriangleright)}
+    \\+ L  \|\bar{\bm{x}}^{(t,k+1)}-\bar{\bm{x}}^{(t,k)} \|^2  +L \frac{1}{M} \sum_{i=1}^M \|\bar{\bm{x}}^{(t,k)}-\bm{x}_i^{(t,k)} \|^2 
+\end{align*}
+
+We will analyze $(\blacktriangleright)$ later, when we take expectations, let us now focus on $(\blacktriangleleft)$. Using that client algorithm steps are computed as $\bm{x}_i^{(t,k+1)} = \bm{x}_i^{(t,k)} + \eta g_i(\bm{x}_i^{(t,k)})$, and that the inner product is distributive over addition we can develop $(\blacktriangleleft)$ as follows:
+
+\begin{align*}
+    (\blacktriangleleft) = \frac{1}{M} \sum_{i=1}^M  \langle g_i(\bm{x})  ,\bar{\bm{x}}^{(t,k+1)} - \bm{x}^{*} \rangle =  \langle \frac{1}{M} \sum_{i=1}^M  g_i(\bm{x})  ,\bar{\bm{x}}^{(t,k+1)} - \bm{x}^{*} \rangle \\
+    =  \Bigg\langle \frac{\bar{\bm{x}}^{(t,k+1)} - \bar{\bm{x}}^{(t,k)}}{\eta},\bar{\bm{x}}^{(t,k+1)} - \bm{x}^{*} \Bigg\rangle = \frac{1}{\eta} \langle \bar{\bm{x}}^{(t,k+1)} - \bar{\bm{x}}^{(t,k)},\bar{\bm{x}}^{(t,k+1)} - \bm{x}^{*} \rangle.
+\end{align*}
+\noindent
+Which we can convert into a sum of norms using the polarization identity (property \ref{polID}) \textcolor{red}{The sum is wrong, TODO, fix it}:
+
+\begin{align*}
+    (\blacktriangleleft) = \frac{1}{\eta} \langle \bar{\bm{x}}^{(t,k+1)} - \bar{\bm{x}}^{(t,k)},\bar{\bm{x}}^{(t,k+1)} - \bm{x}^{*} \rangle \\
+    = \frac{1}{2\eta} \left(\|  \bar{\bm{x}}^{(t,k+1)} - \cancel{\bar{\bm{x}}^{(t,k)}} + \cancel{\bar{\bm{x}}^{(t,k+1)}} - \bm{x}^{*} \|^2 - \|  \bar{\bm{x}}^{(t,k+1)} - \bar{\bm{x}}^{(t,k)} \|^2 - \| \bar{\bm{x}}^{(t,k+1)} - \bm{x}^{*} \|^2\right) \\
+    = \frac{1}{2\eta} \left(\|  \bar{\bm{x}}^{(t,k+1)} - \bm{x}^{*} \|^2 - \|  \bar{\bm{x}}^{(t,k+1)} - \bar{\bm{x}}^{(t,k)} \|^2 - \| \bar{\bm{x}}^{(t,k+1)} - \bm{x}^{*} \|^2 \right)
+\end{align*}
+
+The $(\blacktriangleleft)$ term now looks a lot like a sum which we will be able to telescope (which is what we intended). Let us plug it back into $(\heartsuit)$:
+
+\begin{align*}
+    (\heartsuit)  = F(\bar{\bm{x}}^{(t,k+1)}) - F(\bm{x}^*) \\ \leq \overbrace{ \frac{1}{2\eta} \Big(\|  \bar{\bm{x}}^{(t,k)} - \bm{x}^{*} \|^2 - \|  \bar{\bm{x}}^{(t,k+1)} - \bar{\bm{x}}^{(t,k)} \|^2 - \| \bar{\bm{x}}^{(t,k+1)} - \bm{x}^{*} \|^2 \Big)}^{(\blacktriangleleft)} \\
+    + \overbrace{\frac{1}{M} \sum_{i=1}^M  \langle F_i(\bm{x}) - g_i(\bm{x})  ,\bar{\bm{x}}^{(t,k+1)} - \bm{x}^{*} \rangle  }^{(\blacktriangleright)}
+    \\+ L  \|\bar{\bm{x}}^{(t,k+1)}-\bar{\bm{x}}^{(t,k)} \|^2  +L \frac{1}{M} \sum_{i=1}^M \|\bar{\bm{x}}^{(t,k)}-\bm{x}_i^{(t,k)} \|^2,
+\end{align*}
+\noindent
+and take expectations (we use the linearity of expectation to separate the terms and make the expression more readable):
+\begin{align*}
+    (\dagger) = \mathbb{E} \Big[ \overbrace{F(\bar{\bm{x}}^{(t,k+1)}) - F(\bm{x}^*)}^{(\heartsuit)} | \mathcal{F}^{(t,k)}\Big]\\
+    \leq \frac{1}{2\eta} \mathbb{E} \Bigg[
+    \|  \bar{\bm{x}}^{(t,k)} - \bm{x}^{*} \|^2 \Bigg]
+    -  \frac{1}{2\eta} \mathbb{E} \Bigg[ \|  \bar{\bm{x}}^{(t,k+1)} - \bar{\bm{x}}^{(t,k)} \|^2 \Bigg] \\
+    - \frac{1}{2\eta}  \mathbb{E} \Bigg[ \| \bar{\bm{x}}^{(t,k+1)} - \bm{x}^{*} \|^2  \Bigg] 
+    +  \overbrace{\mathbb{E} \Bigg[ \frac{1}{M} \sum_{i=1}^M  \langle F_i(\bm{x}) - g_i(\bm{x})  ,\bar{\bm{x}}^{(t,k+1)} - \bm{x}^{*} \rangle    \Bigg] }^{(\mathbb{E}[\blacktriangleright])}
+    \\+ L \mathbb{E} \Bigg[ \|\bar{\bm{x}}^{(t,k+1)}-\bar{\bm{x}}^{(t,k)} \|^2  \Bigg]  + \frac{L}{M}  \mathbb{E} \Bigg[ \sum_{i=1}^M \|\bar{\bm{x}}^{(t,k)}-\bm{x}_i^{(t,k)} \|^2 \Bigg] \\
+    = \overbrace{\left(\frac{1}{2\eta} + L \right) \mathbb{E} \Bigg[ 
+        \|  \bar{\bm{x}}^{(t,k)} - \bm{x}^{*} \|^2 \Bigg]}^{\geq 0 \iff \eta \leq \frac{1}{4L}}
+    -  \frac{1}{2\eta} \mathbb{E} \Bigg[  \|  \bar{\bm{x}}^{(t,k+1)} - \bar{\bm{x}}^{(t,k)} \|^2 \Bigg] \\
+    - \frac{1}{2\eta}  \mathbb{E} \Bigg[  \| \bar{\bm{x}}^{(t,k+1)} - \bm{x}^{*} \|^2  \Bigg] 
+    +  \overbrace{\mathbb{E} \Bigg[ \frac{1}{M} \sum_{i=1}^M  \langle F_i(\bm{x}) - g_i(\bm{x})  ,\bar{\bm{x}}^{(t,k+1)} - \bm{x}^{*} \rangle    \Bigg] }^{(\mathbb{E}[\blacktriangleright])}
+    \\+ \frac{L}{M}  \mathbb{E} \Bigg[ \sum_{i=1}^M \|\bar{\bm{x}}^{(t,k)}-\bm{x}_i^{(t,k)} \|^2 \Bigg] 
+\end{align*}
+using the assumption $\eta \leq \frac{1}{4L}$ we can remove one term and get to the following form: 
+
+\begin{align*}
+    (\dagger) \leq \overbrace{\mathbb{E} \Bigg[ \frac{1}{M} \sum_{i=1}^M  \langle F_i(\bm{x}) - g_i(\bm{x})  ,\bar{\bm{x}}^{(t,k+1)} - \bm{x}^{*} \rangle    \Bigg] }^{(\mathbb{E}[\blacktriangleright])}
+    + \frac{L}{M}  \mathbb{E} \Bigg[ \sum_{i=1}^M \|\bar{\bm{x}}^{(t,k)}-\bm{x}_i^{(t,k)} \|^2 \Bigg] \\ -  \frac{1}{2\eta} \Bigg( \mathbb{E} \Big[  \|  \bar{\bm{x}}^{(t,k+1)} - \bar{\bm{x}}^{(t,k)} \|^2 \Big] 
+    + \mathbb{E} \Big[  \| \bar{\bm{x}}^{(t,k+1)} - \bm{x}^{*} \|^2  \Big] \Bigg).
+\end{align*}
+
+In that notation we see that the last term that poses problem is $(\mathbb{E}[\blacktriangleright])$, which we will be able to bound as follows:
+
+\begin{align*}
+    \mathbb{E} \Bigg[ \frac{1}{M} \sum_{i=1}^M  \langle F_i(\bm{x}) - g_i(\bm{x})  ,\bar{\bm{x}}^{(t,k+1)} - \bm{x}^{*} \rangle \Bigg] 
+\end{align*}
