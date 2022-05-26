@@ -1,0 +1,16 @@
+In order to better understand the behavior of algorithm \ref{FedAVG}, we first consider a simple toy problem which we will use as a reference to analyze the behavior of the algorithm on a more complex dataset. 
+
+
+\subsection{A simple learning problem:}
+
+Consider the following "\textit{single layer linear neural network}" model:
+
+\begin{align*}
+    \hat{{y}}(\bm{x},\bm(w)) = \bm{w}^T \bm{x}
+\end{align*}
+
+which we use as a classifier for a simple two class classification problem. We train our model using FedAVG and the following quadratic loss function:
+\begin{align*}
+    L_D(\bm{w}) = \frac{1}{|D|} \sum_{\bm{x}_i,\bm{y}_i}^D (\hat{{y}}(\bm{x}_i,\bm(w)) - y_i)^2,
+\end{align*}
+where $D$ is our dataset containing $|D|~\bm{x}_i,\bm{y}_i$ input-class pairs. This loss function is convex and $L$-smooth.
