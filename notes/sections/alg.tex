@@ -1,0 +1,37 @@
+\subsection{Problem definition}
+
+
+
+\textbf{TODOs}
+\begin{itemize}
+    \item Setting description
+    \item Cost function
+\end{itemize}
+
+
+\subsection{The Federated Averaging Algorithm}
+
+We consider the Federate Algorithm (\textit{FedAVG}) which we formally describe below.
+
+
+
+
+\begin{algorithm}
+    \caption{Federated Averaging}
+    \label{FedAVG}
+    \textbf{Input : } initial model $\bm{x}^(0)$, learning rate $\eta$ \\
+    \For(){$t \in \{0,1,...,T-1\} $}{
+        \For(){$i \in \{1,...,M\} $ clients in parallel}{
+            Initialize local model $\bm{x}^{(t,0)}_i \leftarrow \bm{x}^{(t)}$ \\
+            \For(){$k \in \{0,...,\tau\} $}{
+                Compute local stochastic gradient ${g_i}(\bm{x}^{(t,k)})$ \\
+                Compute local step $\bm{x}_i^{(t,k+1)} \leftarrow \bm{x}_i^{(t,k)} - \eta {g_i}(\bm{x}^{(t,k)})$
+            }
+            Compute local change over round $\Delta_i^{(t)} \leftarrow \bm{x}_i^{(t,\tau)} - \bm{x}_i ^{(t,0)}$
+        }
+        Average local updates $\Delta^{(t)} = \frac{1}{M} \cdot \sum_{i=1}^M \Delta_i^{(t)}$ \\
+        Update global model $\bm{x}^{(t+1)} \leftarrow \bm{x}^{(t)} + \Delta^{(t)}$ 
+    }
+    \textbf{Return :} $\bm{x}^{(t)}$
+\end{algorithm}
+

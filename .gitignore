@@ -1,4 +1,13 @@
 .ipynb_checkpoints/*
+notes/sections/alg.tex
+notes/convergence_proof_notes.toc
+notes/convergence_proof_notes.aux
+notes/convergence_proof_notes.fdb_latexmk
+notes/convergence_proof_notes.fls
+notes/convergence_proof_notes.log
+notes/convergence_proof_notes.out
+notes/convergence_proof_notes.synctex.gz
+notes/.vscode/settings.json
 venv
 leaf
 logs

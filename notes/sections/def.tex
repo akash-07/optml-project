@@ -1,0 +1,23 @@
+In the following subsection, we list the different properties and lemmas that are useful to the proofs of the convergence of algorithm \ref{FedAVG}. First, we consider convexity and smoothness lemmas: 
+
+\begin{property}
+    (First order characterization of convexity) suppose $\bm{dom}(f)$ is open and that $f:\bm{dom}(f) \rightarrow \mathbb{R}$ is differentiable (it's gradient $\nabla f(x)$ exists $\forall \bm{x} \in \bm{dom}(f)$), then $f$ is convex $\iff$
+    \[ f(\bm{y}) \geq f(\bm{x}) + \langle \nabla f(\bm{x}) , \bm{y}-\bm{x} \rangle ,~  \forall \bm{x},\bm{y} \in \bm{dom}(f). \]
+    \label{convexity}
+\end{property}
+\noindent
+This first property is equivalent to the \textit{monotonicity of the gradient property below} which will be more useful to our proofs.
+
+\begin{property}
+    (Monotonicity of the gradient for differentiable convex function) suppose $\bm{dom}(f)$ is open and that $f:\bm{dom}(f) \rightarrow \mathbb{R}$ is differentiable (it's gradient $\nabla f(x)$ exists $\forall \bm{x} \in \bm{dom}(f)$), then $f$ is convex $\iff$
+    \[  \langle \nabla f(\bm{y}) - \nabla f(\bm{x}) , \bm{y}-\bm{x} \rangle \geq 0 ,  \forall \bm{x},\bm{y} \in \bm{dom}(f). \]
+    \label{monotone_grad}
+\end{property}
+
+\noindent
+We will also use the definition of L-smoothness:
+\begin{property}
+    (L-Smoothness) let $f:\bm{dom}(f) \rightarrow \mathbb{R}$ be a differentiable function and $X \subseteq \bm{dom}(f)$ convex and $L\in\mathbb{R}_+$. Function $f$ is called \textit{smooth} over $X$ if:
+    \[  f(\bm{y}) \leq f(\bm{x}) +  \langle \nabla f(\bm{x}) , \bm{y}-\bm{x} \rangle +  \frac{L}{2} \|\bm{y}-\bm{x} \|^2 ,~  \forall \bm{x},\bm{y} \in \bm{dom}(f). \]
+    \label{lsmooth}
+\end{property}
