@@ -8,10 +8,10 @@ fr=$6
 runl=$7
 runr=$8
 
-LOGROOT=../logs/$(whoami)/fedavg/
+LOGROOT=/mnt/nfs/$(whoami)/optml/logs/fedavg
 
 for ((i=$runl; i<=$runr; i++))
 	do	        
-		python main.py -d $dataset -traindir ../leaf/data/${dataset}/data/train/ -testdir ../leaf/data/${dataset}/data/test/ -b $b -r $r -ee 2 -n 20 -lb $l -up $u -l ${LOGROOT}/${dataset}/${l}_${u}_lr${r}/r${i} -mwf ../model_weights/${dataset}/m${i}.h5 -sd $i -f $fr
+		python main.py -d $dataset -traindir /mnt/nfs/dhasade/optml/data/${dataset}/train/ -testdir /mnt/nfs/dhasade/optml/data/${dataset}/test/ -b $b -r $r -ee 2 -n 20 -lb $l -up $u -l ${LOGROOT}/${dataset}/${l}_${u}_lr${r}/r${i} -mwf ../model_weights/${dataset}/m${i}.h5 -sd $i -f $fr
 	done
 
