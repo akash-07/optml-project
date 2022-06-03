@@ -290,5 +290,30 @@ using the assumption $\eta \leq \frac{1}{4L}$ we can remove one term and get to 
 In that notation we see that the last term that poses problem is $(\mathbb{E}[\blacktriangleright])$, which we will be able to bound as follows. Using that $\mathbb{E} \big[ \frac{1}{M} \sum_{i=1}^M \nabla F_i(\bm{x}) - g_i(\bm{x}) \big] = 0$:
 \begin{align*}
     \mathbb{E} \Bigg[ \frac{1}{M} \sum_{i=1}^M  \langle \nabla F_i(\bm{x}) - g_i(\bm{x})  ,\bar{\bm{x}}^{(t,k+1)} - \bm{x}^{*} \rangle \Bigg] \\
-    = \mathbb{E} \Bigg[ \frac{1}{M} \sum_{i=1}^M  \langle \nabla F_i(\bm{x}) - g_i(\bm{x})  ,\bar{\bm{x}}^{(t,k+1)} - \bar{\bm{x}}^{(t,k)} \rangle \Bigg] \\
+    = \mathbb{E} \Bigg[ \frac{1}{M} \sum_{i=1}^M  \langle \nabla F_i(\bm{x}) - g_i(\bm{x})  ,\bar{\bm{x}}^{(t,k+1)} - \bar{\bm{x}}^{(t,k)} \rangle \Bigg].
+\end{align*}
+
+Using Young's inequality (property \ref{young}) we further get that:
+
+\begin{align*}
+    (\mathbb{E}[\blacktriangleright]) \leq \mathbb{E} \Bigg[\sum_{i=1}^M  \|  \frac{1}{M} \nabla F_i(\bm{x}) - g_i(\bm{x}) \|^2 + \| \bar{\bm{x}}^{(t,k+1)} - \bar{\bm{x}}^{(t,k)} \|^2 \Bigg] \\
+    = \frac{1}{M^2} \mathbb{E} \Bigg[ \frac{(\sqrt{2\eta})^2}{2} \sum_{i=1}^M  \| \nabla F_i(\bm{x}) - g_i(\bm{x}) \|^2 \Bigg] +  \mathbb{E} \Bigg[ \frac{1}{2(\sqrt{2\eta})^2} \| \bar{\bm{x}}^{(t,k+1)} - \bar{\bm{x}}^{(t,k)} \|^2 \Bigg]\\
+    = \frac{\eta}{M^2}\overbrace{ \mathbb{E} \Bigg[ \sum_{i=1}^M  \| \nabla F_i(\bm{x}) - g_i(\bm{x}) \|^2 \Bigg]}^{\leq M\sigma^2} +  \frac{1}{4\eta} \mathbb{E} \Bigg[  \| \bar{\bm{x}}^{(t,k+1)} - \bar{\bm{x}}^{(t,k)} \|^2 \Bigg].
+\end{align*}
+We can bound $\mathbb{E} \big[ \sum_{i=1}^M  \| \nabla F_i(\bm{x}) - g_i(\bm{x}) \|^2 \big]$ with assumption 6,
+\begin{align*}
+    (\mathbb{E}[\blacktriangleright]) \leq \frac{\eta \sigma^2}{M} +  \frac{1}{4\eta} \mathbb{E} \Bigg[  \| \bar{\bm{x}}^{(t,k+1)} - \bar{\bm{x}}^{(t,k)} \|^2 \Bigg].
+\end{align*}
+plugging this expression back into $(\dagger)$ we get:
+
+
+\begin{align*}
+    (\dagger) \leq \frac{\eta \sigma^2}{M} +  \frac{1}{4\eta} \mathbb{E} \Bigg[  \| \bar{\bm{x}}^{(t,k+1)} - \bar{\bm{x}}^{(t,k)} \|^2 \Bigg]
+    + \overbrace{\frac{L}{M}  \mathbb{E} \Bigg[ \sum_{i=1}^M \|\bar{\bm{x}}^{(t,k)}-\bm{x}_i^{(t,k)} \|^2 \Bigg]}^{=L\cdot \mathbb{E} \Bigg[  \| \bar{\bm{x}}^{(t,k+1)} - \bar{\bm{x}}^{(t,k)} \|^2 \Bigg]} \\
+    -  \frac{1}{2\eta} \Bigg( \mathbb{E} \Big[  \|  \bar{\bm{x}}^{(t,k+1)} - \bar{\bm{x}}^{(t,k)} \|^2 \Big] 
+    + \mathbb{E} \Big[  \| \bar{\bm{x}}^{(t,k+1)} - \bm{x}^{*} \|^2  \Big] \Bigg)\\
+    = \frac{\eta \sigma^2}{M} +  \frac{1}{4\eta} \mathbb{E} \Bigg[  \| \bar{\bm{x}}^{(t,k+1)} - \bar{\bm{x}}^{(t,k)} \|^2 \Bigg]
+    + \overbrace{\frac{L}{M}  \mathbb{E} \Bigg[ \sum_{i=1}^M \|\bar{\bm{x}}^{(t,k)}-\bm{x}_i^{(t,k)} \|^2 \Bigg]}^{=L\cdot \mathbb{E} \Bigg[  \| \bar{\bm{x}}^{(t,k+1)} - \bar{\bm{x}}^{(t,k)} \|^2 \Bigg]} \\
+    -  \frac{1}{2\eta} \Bigg( \mathbb{E} \Big[  \|  \bar{\bm{x}}^{(t,k+1)} - \bar{\bm{x}}^{(t,k)} \|^2 \Big] 
+    + \mathbb{E} \Big[  \| \bar{\bm{x}}^{(t,k+1)} - \bm{x}^{*} \|^2  \Big] \Bigg)
 \end{align*}
