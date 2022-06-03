@@ -12,3 +12,4 @@ venv
 leaf
 logs
 */__pycache__
+.idea
