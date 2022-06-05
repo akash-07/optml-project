@@ -9,7 +9,7 @@ def generate_data(name, mean_class1, var_class1, n_samples_class1, mean_class2, 
     labels = np.zeros((n_samples_class1 + n_samples_class2,))
     labels[n_samples_class1:] = 1
 
-    return {name: {"x": data.tolist(), 1: labels.tolist()}}
+    return {name: {"x": data.tolist(), "y": labels.tolist()}}
 
 
 def generate_jsons(data_dir, filename, n_clients, last_client_offset=3, mean_class1=(0, 0), var_class1=(0.25, 0.25), mean_class2=(1, 1), var_class2=(0.25, 0.25), n_samples_class1=50, n_samples_class2=50, n_dims=2):
