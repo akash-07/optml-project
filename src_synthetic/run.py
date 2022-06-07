@@ -88,8 +88,10 @@ def run_fl(
                 test_losses.append(test_loss)
 
             client_indexes = rng.integers(
-                low=0, high=total_clients, size=num_clients)
+                low=0, high=total_clients-1, size=num_clients)
             
+            # Studying effect of non-iid data
+            client_indexes[-1] = 19
             client_ids = []
             client_num_samples = []
             for client_index in client_indexes:
