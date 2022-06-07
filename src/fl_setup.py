@@ -5,7 +5,6 @@ import nest_asyncio
 import os
 
 nest_asyncio.apply()
-np.random.seed(0)
 os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
 #------------------------------------------------------------------------------ 
