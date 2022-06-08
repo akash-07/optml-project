@@ -12,6 +12,6 @@ LOGROOT=/mnt/nfs/$(whoami)/optml/logs/fedavg
 
 for ((i=$runl; i<=$runr; i++))
 	do	        
-		python main.py -d $dataset -traindir /mnt/nfs/dhasade/optml/data/${dataset}/train/ -testdir /mnt/nfs/dhasade/optml/data/${dataset}/test/ -b $b -r $r -ee 2 -n 20 -lb $l -up $u -l ${LOGROOT}/${dataset}/${l}_${u}_lr${r}/r${i} -mwf ../model_weights/${dataset}/m${i}.h5 -sd $i -f $fr
+		python main.py -d $dataset -traindir /mnt/nfs/dhasade/optml/data/${dataset}/train/ -testdir /mnt/nfs/dhasade/optml/data/${dataset}/test/ -b $b -r $r -ee 1 -n 2 -lb $l -up $u -l ${LOGROOT}/${dataset}/${l}_${u}_lr${r}/r${i} -sd $i -f $fr -sm True #-mwf ../model_weights/${dataset}/m${i}.h5 
 	done
 

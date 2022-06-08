@@ -16,8 +16,8 @@ my_parser.add_argument(
     '--dataset',
     action='store',
     type=str,
-    choices=['femnist'],
-    default='femnist',
+    choices=['femnist', 'synthetic'],
+    default='synthetic',
     help='Dataset on which to run experiment.')
 
 my_parser.add_argument(
@@ -164,6 +164,17 @@ if(dset == 'femnist'):
     preprocess = preprocess_femnist
     central_test_dataset = dataset.create_test_dataset_for_all_clients().batch(TEST_BATCH_SIZE).map(femnist_batch_format_fn)
     evaluate = evaluate_femnist
+elif(dset == 'synthetic'):
+    # Make this global across all modules
+    builtins.model_fn = tff_perceptron_model_fn
+    builtins.keras_model_fn = get_perceptron
+
+    TEST_BATCH_SIZE = 100
+    check_stopping_criteria = check_stopping_criteria_synthetic
+    dataset = SyntheticData(train_dir, test_dir)
+    preprocess = preprocess_synthetic
+    central_test_dataset = dataset.create_test_dataset_for_all_clients().batch(TEST_BATCH_SIZE)
+    evaluate = evaluate_synthetic
 
 TC = len(dataset.num_samples)
 print("Total number of client in this dataset:", TC)
@@ -198,7 +209,7 @@ _, _, _, state, train_metrics, test_metrics = run_fl(
     num_clients=args.num_clients,
     fixed_rounds=args.fixed_rounds,
     evaluate_every=args.evaluate_every,
-    lr_schedule=lambda _: eta,
+    lr_schedule=lambda round_num: eta,
     model_weights_file=args.model_weights_file)
 
 # Write train, test, budgets and guesses csv ---------------
@@ -218,6 +229,13 @@ if(args.save_model):
         keras_model.compile(
             loss=tf.keras.losses.SparseCategoricalCrossentropy(),
             metrics=[tf.keras.metrics.SparseCategoricalAccuracy()]  
+        )
+        keras_model.set_weights(state)
+    elif(dset == 'synthetic'):
+        keras_model = get_perceptron()
+        keras_model.compile(
+            loss=tf.keras.losses.BinaryCrossentropy(from_logits=True),
+            metrics=[tf.keras.metrics.BinaryAccuracy(threshold=0.0)]  
         )
         keras_model.set_weights(state)
 
