@@ -209,7 +209,7 @@ _, _, _, state, train_metrics, test_metrics = run_fl(
     num_clients=args.num_clients,
     fixed_rounds=args.fixed_rounds,
     evaluate_every=args.evaluate_every,
-    lr_schedule=lambda round_num: eta/(1 + round_num),
+    lr_schedule=lambda round_num: eta,
     model_weights_file=args.model_weights_file)
 
 # Write train, test, budgets and guesses csv ---------------

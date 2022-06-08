@@ -53,6 +53,9 @@ def client_update(model, dataset, server_weights, lr, accumulator):
         
         tf.nest.map_structure(lambda x, y: x.assign(y), client_weights, updated_weights)
         tf.nest.map_structure(lambda x, y: x.assign(y), accumulator, updated_accumulator)
+
+        # Simulate freezing of normal vector, train only biases
+        client_weights[0].assign([[2.700213],[0.7134238]])
     
     # dictionary containing  {metric: [sum, count], ..}
     out_data = model.report_local_outputs()

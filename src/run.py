@@ -53,6 +53,9 @@ def run_fl(
     )
 
     state = iterative_process.initialize()
+    # Freeze the slope
+    state[0] = np.array([[2.700213],[0.7134238]])
+    state[1] = np.array([2])
 
     if(model_weights_file is not None):
         print('[Loading weights from file]')
@@ -99,8 +102,9 @@ def run_fl(
                 test_losses.append(test_loss)
 
             client_indexes = rng.integers(
-                low=0, high=total_clients, size=num_clients)
+                low=0, high=total_clients-1, size=num_clients)
 
+            # client_indexes[-1] = 19
             client_ids = []
             client_num_samples = []
             for client_index in client_indexes:
@@ -148,14 +152,15 @@ def run_fl(
                     best_accuracy = test_accuracy
                     best_accuracy_round_num = round_num
 
+                # NOTE: Updated to log current T.A instead of the best
                 tf.summary.scalar('test_loss', test_loss, step=round_num)
                 tf.summary.scalar(
-                    'test_accuracy', best_accuracy, step=round_num)
+                    'test_accuracy', test_accuracy, step=round_num)
 
                 print(
                     '[Test loss - {} Test accuracy - {}]'.format(test_loss, test_accuracy))
                 test_index.append(round_num)
-                test_accuracies.append(best_accuracy)
+                test_accuracies.append(test_accuracy)
                 test_losses.append(test_loss)
 
                 if(fixed_rounds is not None and round_num >= fixed_rounds):
