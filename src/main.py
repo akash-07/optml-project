@@ -194,7 +194,7 @@ with open(os.path.join(log_dir, 'params.txt'), 'w') as f:
 # For reproducible client selection and budget sampling
 rng = np.random.default_rng(args.seed)
 
-_, _, _, state, train_metrics, test_metrics = run_fl(
+_, _, _, state, train_metrics, test_metrics, all_grad_diffs = run_fl(
     rng,
     dataset,
     preprocess,
@@ -219,8 +219,10 @@ train_d = {'train_accuracies':train_accuracies, 'train_losses':train_losses, 'tr
 test_d = {'test_accuracies':test_accuracies, 'test_losses':test_losses, 'test_index':test_index}
 df_train = pd.DataFrame(data=train_d)
 df_test = pd.DataFrame(data=test_d)
+df_grad_diffs = pd.DataFrame(all_grad_diffs)
 df_train.to_csv(os.path.join(log_dir, 'train.csv'), index=False)
 df_test.to_csv(os.path.join(log_dir, 'test.csv'), index=False)
+df_grad_diffs.to_csv(os.path.join(log_dir, 'grad_diffs.csv'), index=False, header=False)
 
 # Save model ---------------
 if(args.save_model):

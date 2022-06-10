@@ -1,3 +1,4 @@
+from numpy import full
 import tensorflow_federated as tff
 from fl_setup import *
 from data_utils import make_federated_data
@@ -79,6 +80,12 @@ def run_fl(
     test_losses = []
     test_index = []
 
+    all_grad_diffs = []
+
+    full_training_dataset = dataset.create_train_dataset_for_all_clients()
+    print("[Cardinality of full training dataset", full_training_dataset.cardinality(), "]")
+    full_training_dataset = full_training_dataset.batch(full_training_dataset.cardinality())
+
     with tf.summary.create_file_writer(log_dir).as_default():
         while(True):
             print("[Round {}]".format(round_num))
@@ -104,7 +111,7 @@ def run_fl(
             client_indexes = rng.integers(
                 low=0, high=total_clients-1, size=num_clients)
 
-            # client_indexes[-1] = 19
+            client_indexes[-1] = 19
             client_ids = []
             client_num_samples = []
             for client_index in client_indexes:
@@ -124,14 +131,18 @@ def run_fl(
 
             federated_train_data = make_federated_data(
                 dataset, preprocess, client_ids, client_num_samples, budgets, hparams['batch_size'], round_num)
+            federated_full_training_dataset = [full_training_dataset]*num_clients
 
             # ---------- Train one round
-            state, metrics = iterative_process.next(
+            state, metrics, grad_diffs = iterative_process.next(
                 state,
                 federated_train_data,
+                federated_full_training_dataset,
                 lr_to_clients,
                 client_agg_weights
                 )
+
+            all_grad_diffs.append([grad_diff.numpy()[0] for grad_diff in grad_diffs])
 
             for name, value in metrics.items():
                 tf.summary.scalar('train_' + name, value, step=round_num)
@@ -164,8 +175,8 @@ def run_fl(
                 test_losses.append(test_loss)
 
                 if(fixed_rounds is not None and round_num >= fixed_rounds):
-                    return best_accuracy, best_accuracy_round_num, round_num, state, (train_accuracies, train_losses, train_index), (test_accuracies, test_losses, test_index)
+                    return best_accuracy, best_accuracy_round_num, round_num, state, (train_accuracies, train_losses, train_index), (test_accuracies, test_losses, test_index), all_grad_diffs
                 elif(fixed_rounds is None and check_stopping_criteria(test_losses[-10:], test_accuracies[-10:], best_accuracy, round_num)):
-                    return best_accuracy, best_accuracy_round_num, round_num, state, (train_accuracies, train_losses, train_index), (test_accuracies, test_losses, test_index)
+                    return best_accuracy, best_accuracy_round_num, round_num, state, (train_accuracies, train_losses, train_index), (test_accuracies, test_losses, test_index), all_grad_diffs
 
             round_num = round_num + 1
