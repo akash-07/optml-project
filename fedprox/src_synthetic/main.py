@@ -16,7 +16,7 @@ my_parser.add_argument(
     '--dataset',
     action='store',
     type=str,
-    choices=['femnist', 'synthetic'],
+    choices=['synthetic'],
     default='synthetic',
     help='Dataset on which to run experiment.')
 
@@ -43,6 +43,14 @@ my_parser.add_argument(
     type=float,
     required=True,
     help='Learning rate for training.')
+
+my_parser.add_argument(
+    '-mu',
+    '--mu',
+    action='store',
+    type=float,
+    default=0.01,
+    help='FedProx regularizer.')
 
 my_parser.add_argument(
     '-b',
@@ -133,6 +141,7 @@ for k,v in vars(args).items():
 
 # Set args from arg parser ---------------
 eta = args.learning_rate
+mu = args.mu
 B = args.batch_size
 lower_bound = args.lower_bound
 upper_bound = args.upper_bound
@@ -152,19 +161,7 @@ builtins.model_fn = None
 builtins.keras_model_fn = None
 TC = None
 
-#TC = 3597 (Total clients for non-iid)
-if(dset == 'femnist'):
-    # Make this global across all modules
-    builtins.model_fn = tff_femnist_model_fn
-    builtins.keras_model_fn = get_femnist_cnn
-
-    TEST_BATCH_SIZE = 2048
-    check_stopping_criteria = check_stopping_criteria_femnist
-    dataset = FemnistData(train_dir, test_dir)
-    preprocess = preprocess_femnist
-    central_test_dataset = dataset.create_test_dataset_for_all_clients().batch(TEST_BATCH_SIZE).map(femnist_batch_format_fn)
-    evaluate = evaluate_femnist
-elif(dset == 'synthetic'):
+if(dset == 'synthetic'):
     # Make this global across all modules
     builtins.model_fn = tff_perceptron_model_fn
     builtins.keras_model_fn = get_perceptron
@@ -209,7 +206,8 @@ _, _, _, state, train_metrics, test_metrics = run_fl(
     num_clients=args.num_clients,
     fixed_rounds=args.fixed_rounds,
     evaluate_every=args.evaluate_every,
-    lr_schedule=lambda round_num: eta,
+    lr_schedule=lambda _: eta,
+    mu_schedule=lambda _: mu,
     model_weights_file=args.model_weights_file)
 
 # Write train, test, budgets and guesses csv ---------------
@@ -224,14 +222,7 @@ df_test.to_csv(os.path.join(log_dir, 'test.csv'), index=False)
 
 # Save model ---------------
 if(args.save_model):
-    if(dset == 'femnist'):
-        keras_model = get_femnist_cnn()
-        keras_model.compile(
-            loss=tf.keras.losses.SparseCategoricalCrossentropy(),
-            metrics=[tf.keras.metrics.SparseCategoricalAccuracy()]  
-        )
-        keras_model.set_weights(state)
-    elif(dset == 'synthetic'):
+    if(dset == 'synthetic'):
         keras_model = get_perceptron()
         keras_model.compile(
             loss=tf.keras.losses.BinaryCrossentropy(from_logits=True),
