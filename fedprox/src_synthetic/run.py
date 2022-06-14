@@ -1,3 +1,4 @@
+from numpy import full
 import tensorflow_federated as tff
 from fl_setup import *
 from data_utils import make_federated_data
@@ -45,6 +46,7 @@ def run_fl(
     fixed_rounds=None,  # If specified, overrides check for stopping criteria
     evaluate_every=3,  # How often to evaluate on test set
     lr_schedule=None,  # f: int -> float ; takes round number as input
+    mu_schedule=None,  # f: int -> float ; takes round number as input
     model_weights_file=None):  # File containing model weights for consistent initialisation
 
     iterative_process = tff.templates.IterativeProcess(
@@ -104,7 +106,7 @@ def run_fl(
             client_indexes = rng.integers(
                 low=0, high=total_clients-1, size=num_clients)
 
-            # client_indexes[-1] = 19
+            client_indexes[-1] = 19
             client_ids = []
             client_num_samples = []
             for client_index in client_indexes:
@@ -119,6 +121,7 @@ def run_fl(
 
             # ------- Compute/fetch all things necessary for training
             lr_to_clients = [lr_schedule(round_num)]*num_clients
+            prox_reg_to_clients = [mu_schedule(round_num)]*num_clients
             client_agg_weights = get_client_agg_weights(
                 budgets, client_num_samples, hparams['batch_size'])
 
@@ -130,6 +133,7 @@ def run_fl(
                 state,
                 federated_train_data,
                 lr_to_clients,
+                prox_reg_to_clients,
                 client_agg_weights
                 )
 

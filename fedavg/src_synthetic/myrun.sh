@@ -8,7 +8,7 @@ fr=$6
 runl=$7
 runr=$8
 
-LOGROOT=/mnt/nfs/$(whoami)/optml/logs/fedavg
+LOGROOT=/mnt/nfs/$(whoami)/optml/logs/fedavg/gradients
 
 for ((i=$runl; i<=$runr; i++))
 	do	        
