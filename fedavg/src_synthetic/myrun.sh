@@ -8,10 +8,10 @@ fr=$6
 runl=$7
 runr=$8
 
-LOGROOT=/mnt/nfs/$(whoami)/optml/logs/fedavg/gradients
+LOGROOT=../../logs/fedavg/artificial
 
 for ((i=$runl; i<=$runr; i++))
 	do	        
-		python main.py -d $dataset -traindir /mnt/nfs/dhasade/optml/data/${dataset}/train/ -testdir /mnt/nfs/dhasade/optml/data/${dataset}/test/ -b $b -r $r -ee 1 -n 2 -lb $l -up $u -l ${LOGROOT}/${dataset}/${l}_${u}_lr${r}/r${i} -sd $i -f $fr -sm True #-mwf ../model_weights/${dataset}/m${i}.h5 
+		python main.py -d $dataset -traindir ../../synthetic_data/train -testdir ../../synthetic_data/test -b $b -r $r -ee 1 -n 2 -lb $l -up $u -l ${LOGROOT}/${dataset}/${l}_${u}_lr${r}/r${i} -sd $i -f $fr -sm True
 	done
 
