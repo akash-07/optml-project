@@ -55,7 +55,8 @@ def run_fl(
 
     state = iterative_process.initialize()
     # Freeze the slope
-    state[0] = np.array([[2.700213],[0.7134238]])
+    # state[0] = np.array([[2.700213],[0.7134238]])
+    state[0] = np.array([[1.0],[1.0]])
     state[1] = np.array([2])
 
     if(model_weights_file is not None):
@@ -76,6 +77,7 @@ def run_fl(
     train_losses = []
     train_index = []
 
+    bias = []
     test_accuracies = []
     test_losses = []
     test_index = []
@@ -85,7 +87,7 @@ def run_fl(
     full_training_dataset = dataset.create_train_dataset_for_all_clients()
     print("[Cardinality of full training dataset", full_training_dataset.cardinality(), "]")
     full_training_dataset = full_training_dataset.batch(full_training_dataset.cardinality())
-
+    bias.append(state[1])
     with tf.summary.create_file_writer(log_dir).as_default():
         while(True):
             print("[Round {}]".format(round_num))
@@ -111,7 +113,7 @@ def run_fl(
             client_indexes = rng.integers(
                 low=0, high=total_clients-1, size=num_clients)
 
-            client_indexes[-1] = 19
+            client_indexes[-1] = 19 # comment this out to have iid data ??
             client_ids = []
             client_num_samples = []
             for client_index in client_indexes:
@@ -173,10 +175,11 @@ def run_fl(
                 test_index.append(round_num)
                 test_accuracies.append(test_accuracy)
                 test_losses.append(test_loss)
-
+                bias.append(state[1])
+                
                 if(fixed_rounds is not None and round_num >= fixed_rounds):
-                    return best_accuracy, best_accuracy_round_num, round_num, state, (train_accuracies, train_losses, train_index), (test_accuracies, test_losses, test_index), all_grad_diffs
+                    return best_accuracy, best_accuracy_round_num, round_num, state, (train_accuracies, train_losses, train_index), (test_accuracies, test_losses, test_index,bias), all_grad_diffs
                 elif(fixed_rounds is None and check_stopping_criteria(test_losses[-10:], test_accuracies[-10:], best_accuracy, round_num)):
-                    return best_accuracy, best_accuracy_round_num, round_num, state, (train_accuracies, train_losses, train_index), (test_accuracies, test_losses, test_index), all_grad_diffs
+                    return best_accuracy, best_accuracy_round_num, round_num, state, (train_accuracies, train_losses, train_index), (test_accuracies, test_losses, test_index,bias), all_grad_diffs
 
             round_num = round_num + 1

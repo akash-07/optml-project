@@ -1,12 +1,16 @@
 \subsection{Problem definition}
 
+We consider a federated optimization problem of the form:
 
+\begin{align*}
+    \underset{x}{\min}~ F(x),
+\end{align*}
+where
+\begin{align*}
+    F(x) =  \frac{1}{M}~ \sum_{i=1}^M F_i(x).
+\end{align*}
 
-\textbf{TODOs}
-\begin{itemize}
-    \item Setting description
-    \item Cost function
-\end{itemize}
+The federated setting of the problem imposes that a given client $i$ can only query the function $F_i$ and that communications are allowed between the server and it's clients.
 
 
 \subsection{The Federated Averaging Algorithm}

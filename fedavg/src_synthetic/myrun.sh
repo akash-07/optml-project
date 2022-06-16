@@ -1,12 +1,12 @@
 #!/bin/bash
 dataset=$1
-r=$2
-b=$3
-l=$4
-u=$5
-fr=$6
-runl=$7
-runr=$8
+r=$2 # learning rate
+b=$3 # batch size --> synthetic: 100
+l=$4 # lower bound on steps
+u=$5 # upper bound on steps
+fr=$6 # fixed rounds : 50
+runl=$7 # how many times do I want to run ? --> 1
+runr=$8 # how many times do I want to run ? --> 1
 
 LOGROOT=../../logs/fedavg/artificial
 
