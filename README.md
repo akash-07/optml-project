@@ -58,8 +58,8 @@ At this point the directory stucture should be as follows:
 |  |  |  +-- data
 |  |  |  |  +-- train_iid
 |  |  |  |  +-- test_iid
-|  |  |  |  +-- train
-|  |  |  |  +-- test
+|  |  |  |  +-- train_niid
+|  |  |  |  +-- test_niid
 ```
 The dataset generation may take an hour depending on your machine. So please only do this where you intend to run the code.
 
