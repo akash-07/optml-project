@@ -214,14 +214,17 @@ _, _, _, state, train_metrics, test_metrics, all_grad_diffs = run_fl(
 
 # Write train, test, budgets and guesses csv ---------------
 train_accuracies, train_losses, train_index = train_metrics
-test_accuracies, test_losses, test_index = test_metrics
+test_accuracies, test_losses, test_index, bias = test_metrics
 train_d = {'train_accuracies':train_accuracies, 'train_losses':train_losses, 'train_index':train_index}
 test_d = {'test_accuracies':test_accuracies, 'test_losses':test_losses, 'test_index':test_index}
+val_d = {'biais':bias, 'biais_index':test_index}
 df_train = pd.DataFrame(data=train_d)
 df_test = pd.DataFrame(data=test_d)
+df_val = pd.DataFrame(data=val_d)
 df_grad_diffs = pd.DataFrame(all_grad_diffs)
 df_train.to_csv(os.path.join(log_dir, 'train.csv'), index=False)
 df_test.to_csv(os.path.join(log_dir, 'test.csv'), index=False)
+df_val.to_csv(os.path.join(log_dir, 'val.csv'), index=False)
 df_grad_diffs.to_csv(os.path.join(log_dir, 'grad_diffs.csv'), index=False, header=False)
 
 # Save model ---------------
