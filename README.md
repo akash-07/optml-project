@@ -1,5 +1,20 @@
 # optml-project
-In this project, we question the assumptions for data heterogeneity in FedAvg analysis.
+In this project, we study and analyse the convergence of the `FedAvg` algorithm under non-IID data.
+
+### Organisation of Code
+
+```
++-- fedavg
+|  +-- src_synthetic [FedAvg on synthetic data]
+|  +-- src_realworld [FedAvg on FEMNIST]
++-- fedprox
+|  |  +-- src_synthetic [FedProx on synthetic data]
++-- synthetic_data_generation [Scripts that generate the synthetic data]
++-- leaf [Submodule linked to leaf repository]
++-- synthetic_data [Generated synthetic data]
++-- notes [Latex file of detailed proof of FedAvg]
++-- model_weights [Model weights for FEMNIST model initialisation]
+```
 
 ## Installation details
 
@@ -100,6 +115,37 @@ cd fedavg/src_synthetic
 ```
 
 The generated logs contain `train.csv` and `test.csv` similar to FEMNIST. Additionally, they contain the trained model parameters saved in `trained_model` subfolder. The difference between local and global gradients per round are saved in `grad_diffs.csv` file. Each column in this file corresponds to one client.
+
+## Instructions for running FedProx on the Synthetic dataset
+
+```bash
+cd fedprox/src_synthetic
+# Activate the virtual environment as described above
+
+# For 1000 local steps, here mu (= 0.1) is specified as 4th last argument
+./myrun.sh synthetic 0.2 100 1000 1000 0.1 20 1 1
+
+# Change accordingly for different number of local steps {10, 50, 300}
+./myrun.sh synthetic 0.2 100 <here> <here> 0.1 20 1 1
+
+# The logs will be produced in logs/fedprox/artificial/synthetic/<local_step>_<local_step>_lr0.2/r1 directory
+```
+
+The generated output is same as in the previous section.
+
+## Plotting
+
+The code also logs into tensorboard while running. All learning curves can be visualised by running the following tensorbaoard command (without needing to plot):
+
+```bash
+# Our tensorboard logs are contained in /tb subdirectory inside 
+# the logging directory. You can run this as:
+tensorboard --logdir specified_logging_directory/tb
+```
+
+Additionally, the code which generates the plots in the paper is included in 
+- `fedavg/src_synthetic/plotter.ipynb`
+- `fedavg/src_realworld/plotter.ipynb`
 
 ## Further customisation details
 
