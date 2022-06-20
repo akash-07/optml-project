@@ -102,10 +102,10 @@ The generated logs contain `train.csv` and `test.csv` which record the losses an
 cd fedavg/src_synthetic
 # Activate the virtual environment as described above
 
-# For 1000 local steps
-./myrun.sh synthetic 0.2 100 1000 1000 50 1 1
+# For 10 local steps
+./myrun.sh synthetic 0.2 100 10 10 50 1 1
 
-# Change accordingly for different number of local steps {10, 50, 300}
+# Change accordingly for different number of local steps {10, 50, 300, 1000}
 ./myrun.sh synthetic 0.2 100 <here> <here> 50 1 1
 
 # For ex for 50 local steps
@@ -122,10 +122,10 @@ The generated logs contain `train.csv` and `test.csv` similar to FEMNIST. Additi
 cd fedprox/src_synthetic
 # Activate the virtual environment as described above
 
-# For 1000 local steps, here mu (= 0.1) is specified as 4th last argument
-./myrun.sh synthetic 0.2 100 1000 1000 0.1 20 1 1
+# For 10 local steps, here mu (= 0.1) is specified as 4th last argument
+./myrun.sh synthetic 0.2 100 10 10 0.1 20 1 1
 
-# Change accordingly for different number of local steps {10, 50, 300}
+# Change accordingly for different number of local steps {10, 50, 300, 1000}
 ./myrun.sh synthetic 0.2 100 <here> <here> 0.1 20 1 1
 
 # The logs will be produced in logs/fedprox/artificial/synthetic/<local_step>_<local_step>_lr0.2/r1 directory
