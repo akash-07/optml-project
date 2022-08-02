@@ -55,8 +55,7 @@ def run_fl(
 
     state = iterative_process.initialize()
     # Freeze the slope
-    # state[0] = np.array([[2.700213],[0.7134238]])
-    state[0] = np.array([[1.0],[1.0]])
+    state[0] = np.array([[2.700213],[0.7134238]])
     state[1] = np.array([2])
 
     if(model_weights_file is not None):

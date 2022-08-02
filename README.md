@@ -1,5 +1,20 @@
 # optml-project
-In this project, we question the assumptions for data heterogeneity in FedAvg analysis.
+In this project, we study and analyse the convergence of the `FedAvg` algorithm under non-IID data.
+
+### Organisation of Code
+
+```
++-- fedavg
+|  +-- src_synthetic [FedAvg on synthetic data]
+|  +-- src_realworld [FedAvg on FEMNIST]
++-- fedprox
+|  |  +-- src_synthetic [FedProx on synthetic data]
++-- synthetic_data_generation [Scripts that generate the synthetic data]
++-- leaf [Submodule linked to leaf repository]
++-- synthetic_data [Generated synthetic data]
++-- notes [Latex file of detailed proof of FedAvg]
++-- model_weights [Model weights for FEMNIST model initialisation]
+```
 
 ## Installation details
 
@@ -18,26 +33,125 @@ pip install -r requirements.txt
 ```
 
 ## Datasets
-
-We will use the [leaf FL benchmark](https://github.com/TalwalkarLab/leaf) for performing tests. It contains variety of datasets aimed at different learning tasks. The current code supports the FEMNIST dataset.
-
-LEAF has been added a submodule. To generate the dataset, do the following:
+### (A) Synthetic
+The synthetic dataset has already been generated and is included in the repository due to its small size. It is present at:
 
 ```
+synthetic_data/{train, test}/{train.json, test.json}
+```
+
+The code which generates this data can be found in the `synthetic_data_generation` folder.
+### (A) FEMNIST
+We generate the FEMNIST dataset from the [leaf FL benchmark](https://github.com/TalwalkarLab/leaf). LEAF has been added a submodule of this repository. To perform the generation, do the following:
+
+```bash
 # pull git submodule locally
 git submodule update --init --recursive
 
 cd leaf/data/feminst
 
 # command description at https://github.com/TalwalkarLab/leaf/tree/master/data/femnist
+
+# To generate iid data
+./preprocess.sh -s iid --sf 1.0 -k 100 -t sample --smplseed 10 --spltseed 10
+# This creates the folders leaf/data/femnist/data/{train, test}
+# Please rename the folders to leaf/data/femnist/data/{train_iid, test_iid} to be able to run the generation again for non-iid data
+
+# To generate non-iid data
+# Delete all folders in leaf/data/femnist/data
+# Then run
 ./preprocess.sh -s niid --sf 1.0 -k 100 -t sample --smplseed 10 --spltseed 10
+# This again creates the folders leaf/data/femnist/data/{train, test}
+# Please rename the folders to leaf/data/femnist/data/{train_niid, test_niid}
 ```
 
-This make take an hour depending on your machine. So only do this where you intend to run the code.
+At this point the directory stucture should be as follows:
+```
++-- leaf
+|  +-- data
+|  |  +-- femnist
+|  |  |  +-- data
+|  |  |  |  +-- train_iid
+|  |  |  |  +-- test_iid
+|  |  |  |  +-- train_niid
+|  |  |  |  +-- test_niid
+```
+The dataset generation may take an hour depending on your machine. So please only do this where you intend to run the code.
 
-## Instructions for running the code
+## Instructions for running FedAvg on the FEMNIST dataset
 
-The script to run is `main.py`. It supports multiple command line arguments:
+```bash
+cd fedavg/src_realworld
+# Activate the virtual environment as described above
+
+# For iid data
+./myrun.sh femnist 0.02 20 25 25 250 1 1 iid
+
+# The logs will be produced in logs/fedavg/realworld/femnist/iid/25_25_lr0.02/r1 directory
+
+# For niid data
+./myrun.sh femnist 0.02 20 25 25 250 1 1 niid
+
+# The logs will be produced in logs/fedavg/realworld/femnist/niid/25_25_lr0.02/r1 directory
+```
+The generated logs contain `train.csv` and `test.csv` which record the losses and accuracies of the server model after each communication round.
+
+## Instructions for running FedAvg on the Synthetic dataset
+
+```bash
+cd fedavg/src_synthetic
+# Activate the virtual environment as described above
+
+# For 10 local steps
+./myrun.sh synthetic 0.2 100 10 10 50 1 1
+
+# Change accordingly for different number of local steps {10, 50, 300, 1000}
+./myrun.sh synthetic 0.2 100 <here> <here> 50 1 1
+
+# For ex for 50 local steps
+./myrun.sh synthetic 0.2 100 50 50 50 1 1
+
+# The logs will be produced in logs/fedavg/artificial/synthetic/<local_step>_<local_step>_lr0.2/r1 directory
+```
+
+The generated logs contain `train.csv` and `test.csv` similar to FEMNIST. Additionally, they contain the trained model parameters saved in `trained_model` subfolder. The difference between local and global gradients per round are saved in `grad_diffs.csv` file. Each column in this file corresponds to one client.
+
+## Instructions for running FedProx on the Synthetic dataset
+
+```bash
+cd fedprox/src_synthetic
+# Activate the virtual environment as described above
+
+# For 10 local steps, here mu (= 0.1) is specified as 4th last argument
+./myrun.sh synthetic 0.2 100 10 10 0.1 20 1 1
+
+# Change accordingly for different number of local steps {10, 50, 300, 1000}
+./myrun.sh synthetic 0.2 100 <here> <here> 0.1 20 1 1
+
+# The logs will be produced in logs/fedprox/artificial/synthetic/<local_step>_<local_step>_lr0.2/r1 directory
+```
+
+The generated output is same as in the previous section.
+
+## Plotting
+
+The code also logs into tensorboard while running. All learning curves can be visualised by running the following tensorbaoard command (without needing to plot):
+
+```bash
+# Our tensorboard logs are contained in /tb subdirectory inside 
+# the logging directory. You can run this as:
+tensorboard --logdir specified_logging_directory/tb
+```
+
+Additionally, the code which generates the plots in the paper is included in 
+- `fedavg/src_synthetic/plotter.ipynb`
+- `fedavg/src_realworld/plotter.ipynb`
+
+## Further customisation details
+
+Each shell script `myrun.sh` mentioned previously in turn runs the `main.py` script in the corresponding directory. 
+
+More functionalities are also supported as detailed below by command line arguments of `main.py` below. Ex. Simulating heterogeneous client local steps by specifying the parameters a and b of the uniform distribution U[a, b].
 
 ```
 usage: main.py [-h] [-d {femnist}] -traindir TRAINING_DIR -testdir TESTING_DIR -r LEARNING_RATE -b BATCH_SIZE -lb
@@ -86,6 +200,3 @@ Elements to note:
 
 ![Screenshot 2022-05-24 at 16 54 48](https://user-images.githubusercontent.com/24961068/170066838-b7eaaaea-090c-42a5-b106-103f4d611e7f.png)
 
-**Checkout `myrun.sh` for an example.** For FEMNIST dataset, one could do:
-
-`./myrun.sh femnist 0.02 20 20 20 15 0 0`

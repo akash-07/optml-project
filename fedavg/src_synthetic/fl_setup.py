@@ -55,8 +55,6 @@ def client_update(model, dataset, full_training_dataset, server_weights, lr, acc
     tf.nest.map_structure(lambda x, y: x.assign(y),
                         client_weights, server_weights)
     
-    biaises = []
-
     # Update the local model using SGD.
     for batch in dataset:
         with tf.GradientTape(persistent=True) as tape:
@@ -72,10 +70,9 @@ def client_update(model, dataset, full_training_dataset, server_weights, lr, acc
         
         tf.nest.map_structure(lambda x, y: x.assign(y), client_weights, updated_weights)
         tf.nest.map_structure(lambda x, y: x.assign(y), accumulator, updated_accumulator)
-        biases.append(updated_weights)
+        
         # Simulate freezing of normal vector, train only biases
-        # client_weights[0].assign([[2.700213],[0.7134238]])
-        client_weights[0].assign([[1.0],[1.0]])
+        client_weights[0].assign([[2.700213],[0.7134238]])
     
     # dictionary containing  {metric: [sum, count], ..}
     out_data = model.report_local_outputs()
